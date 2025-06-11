@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+<!-- AOS CSS -->
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<style>
+    .card-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .service-img {
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .service-img:hover {
+        transform: scale(1.05);
+    }
+    .card-text .see-more-link {
+    cursor: pointer;
+    font-weight: 500;
+}
+</style>
+<br><br>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h1 class="display-5 text-center text-primary">{{ title }}</h1>
+        {% if is_manager %}
+        <a href="{% url 'service_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Ajouter un service
+        </a>
+        {% endif %}
+    </div>
+    
+    <div class="row g-4">
+        {% for service in services %}
+        <div class="col-md-6 col-lg-4" data-aos="fade-up">
+            <div class="card h-100 card-hover border-0 shadow-sm">
+                {% if service.image %}
+                <img src="{{ service.image.url }}" class="card-img-top service-img" alt="{{ service.name }}">
+                {% else %}
+                <div class="service-img bg-light d-flex align-items-center justify-content-center">
+                    <i class="fas fa-spa fa-4x text-muted"></i>
+                </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h5 class="card-title">{{ service.name }}</h5>
+                    {% if service.description|length > 100 %}
+                    <p class="card-text text-muted">
+                        <span class="short-description">{{ service.description|truncatechars:100 }}</span>
+                        <span class="full-description d-none">{{ service.description }}</span>
+                        <a href="javascript:void(0);" class="see-more-link text-dark small">Voir plus</a>
+                    </p>
+                    {% else %}
+                    <p class="card-text text-muted">{{ service.description }}</p>
+                    {% endif %}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-primary rounded-pill">{{ service.duration }} min</span>
+                        <h5 class="mb-0 text-primary">{{ service.price }}€</h5>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-white border-0">
+                    <div class="d-flex justify-content-between">
+                        <a href="#" class="btn btn-outline-primary btn-sm">
+                            <i class="far fa-calendar-alt me-1"></i> Réserver
+                        </a>
+                        {% if is_manager %}
+                        <div>
+                            <a href="{% url 'service_update' service.id %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="post" action="{% url 'service_delete' service.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">Aucun service disponible pour le moment.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<!-- AOS JS -->
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const links = document.querySelectorAll(".see-more-link");
+
+        links.forEach(link => {
+            link.addEventListener("click", () => {
+                const cardText = link.closest(".card-text");
+                const shortDesc = cardText.querySelector(".short-description");
+                const fullDesc = cardText.querySelector(".full-description");
+
+                if (fullDesc.classList.contains("d-none")) {
+                    shortDesc.classList.add("d-none");
+                    fullDesc.classList.remove("d-none");
+                    link.textContent = "Voir moins";
+                } else {
+                    fullDesc.classList.add("d-none");
+                    shortDesc.classList.remove("d-none");
+                    link.textContent = "Voir plus";
+                }
+            });
+        });
+    });
+    AOS.init({
+        duration: 800,
+        once: true
+    });
+</script>
+
+{% endblock %}
+
+
+
+

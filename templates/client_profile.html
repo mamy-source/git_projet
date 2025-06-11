@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3>Mon Profil Client</h3>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Nom d'utilisateur:</label>
+                            <input type="text" class="form-control" value="{{ request.user.username }}" disabled>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Nom complet:</label>
+                            <input type="text" class="form-control" value="{{ request.user.get_full_name|default:'Non renseigné' }}" disabled>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email:</label>
+                            <input type="text" class="form-control" value="{{ request.user.email }}" disabled>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="favorite_employee" class="form-label">Employé préféré:</label>
+                            <select name="favorite_employee" id="favorite_employee" class="form-select">
+                                <option value="">Aucun employé préféré</option>
+                                {% for employee in all_employees %}
+                                    <option value="{{ employee.id }}" {% if profile.favorite_employee and profile.favorite_employee.id == employee.id %}selected{% endif %}>
+                                        {{ employee.user.get_full_name|default:employee.user.username }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">Laissez vide si vous n'avez pas de préférence</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="favorite_services" class="form-label">Services préférés:</label>
+                            <select name="favorite_services" id="favorite_services" class="form-select" multiple size="5">
+                                {% for service in all_services %}
+                                    <option value="{{ service.id }}" {% if service in profile.favorite_services.all %}selected{% endif %}>
+                                        {{ service.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">Maintenez Ctrl/Cmd pour sélectionner plusieurs services</small>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" name="receive_promotions" class="form-check-input" id="promotions" {% if profile.receive_promotions %}checked{% endif %}>
+                            <label class="form-check-label" for="promotions">Je souhaite recevoir des promotions par email</label>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary me-md-2">
+                                <i class="bi bi-save"></i> Enregistrer les modifications
+                            </button>
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Annuler
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

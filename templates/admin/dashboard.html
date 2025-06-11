@@ -1,0 +1,321 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+
+{% block content %}
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1><span>Elysée</span>Beauty</h1>
+                <p>Admin Dashboard</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="#">
+                            <i class="fas fa-home"></i>
+                            <span>Tableau de bord</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Réservations</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-users"></i>
+                            <span>Clients</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'service_list' %}">
+                            <i class="fas fa-spa"></i>
+                            <span>Services</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-concierge-bell"></i>
+                            <span>Équipe</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Statistiques</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-cog"></i>
+                            <span>Paramètres</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Profil Admin">
+                    <div>
+                        <h4>Sophie Martin</h4>
+                        <p>Administrateur</p>
+                    </div>
+                </div>
+                <a href="#" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Déconnexion</span>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-left">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2>Tableau de bord</h2>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Rechercher...">
+                    </div>
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="content-wrapper">
+                <!-- Stats Cards -->
+                <div class="stats-cards">
+                    <div class="card">
+                        <div class="card-icon bg-pink">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="card-info">
+                            <h3>124</h3>
+                            <p>Réservations aujourd'hui</p>
+                        </div>
+                        <div class="card-progress up">
+                            <span>12%</span>
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon bg-purple">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="card-info">
+                            <h3>856</h3>
+                            <p>Clients actifs</p>
+                        </div>
+                        <div class="card-progress up">
+                            <span>8%</span>
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon bg-orange">
+                            <i class="fas fa-spa"></i>
+                        </div>
+                        <div class="card-info">
+                            <h3>32</h3>
+                            <p>Services offerts</p>
+                        </div>
+                        <div class="card-progress">
+                            <span>2 nouveaux</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon bg-teal">
+                            <i class="fas fa-euro-sign"></i>
+                        </div>
+                        <div class="card-info">
+                            <h3>€4,856</h3>
+                            <p>Revenu aujourd'hui</p>
+                        </div>
+                        <div class="card-progress up">
+                            <span>24%</span>
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Row -->
+                <div class="charts-row">
+                    <div class="chart-card big">
+                        <div class="card-header">
+                            <h3>Réservations mensuelles</h3>
+                            <select>
+                                <option>Mai 2023</option>
+                                <option>Avril 2023</option>
+                                <option>Mars 2023</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="bookingsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card small">
+                        <div class="card-header">
+                            <h3>Services populaires</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="servicesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Bookings & Staff -->
+                <div class="tables-row">
+                    <div class="table-card">
+                        <div class="card-header">
+                            <h3>Réservations récentes</h3>
+                            <a href="#" class="view-all">Voir tout</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Client</th>
+                                        <th>Service</th>
+                                        <th>Équipe</th>
+                                        <th>Heure</th>
+                                        <th>Statut</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Client">
+                                            <span>Marie Dupont</span>
+                                        </td>
+                                        <td>Manucure</td>
+                                        <td>Julie</td>
+                                        <td>10:00</td>
+                                        <td><span class="status confirmed">Confirmé</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-ellipsis-v"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Client">
+                                            <span>Pierre Lambert</span>
+                                        </td>
+                                        <td>Massage</td>
+                                        <td>Sophie</td>
+                                        <td>11:30</td>
+                                        <td><span class="status completed">Terminé</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-ellipsis-v"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Client">
+                                            <span>Claire Moreau</span>
+                                        </td>
+                                        <td>Coloration</td>
+                                        <td>Alex</td>
+                                        <td>14:00</td>
+                                        <td><span class="status pending">En attente</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-ellipsis-v"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <img src="https://randomuser.me/api/portraits/women/25.jpg" alt="Client">
+                                            <span>Élodie Petit</span>
+                                        </td>
+                                        <td>Épilation</td>
+                                        <td>Laura</td>
+                                        <td>15:30</td>
+                                        <td><span class="status cancelled">Annulé</span></td>
+                                        <td>
+                                            <button class="action-btn"><i class="fas fa-ellipsis-v"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="staff-card">
+                        <div class="card-header">
+                            <h3>Équipe aujourd'hui</h3>
+                            <a href="#" class="view-all">Voir tout</a>
+                        </div>
+                        <div class="staff-list">
+                            <div class="staff-member">
+                                <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Staff">
+                                <div class="staff-info">
+                                    <h4>Julie Bernard</h4>
+                                    <p>Esthéticienne</p>
+                                    <div class="staff-stats">
+                                        <span><i class="fas fa-calendar-alt"></i> 8 réservations</span>
+                                        <span><i class="fas fa-star"></i> 4.9</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="staff-member">
+                                <img src="https://randomuser.me/api/portraits/women/45.jpg" alt="Staff">
+                                <div class="staff-info">
+                                    <h4>Sophie Leroy</h4>
+                                    <p>Massothérapeute</p>
+                                    <div class="staff-stats">
+                                        <span><i class="fas fa-calendar-alt"></i> 5 réservations</span>
+                                        <span><i class="fas fa-star"></i> 4.8</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="staff-member">
+                                <img src="https://randomuser.me/api/portraits/men/55.jpg" alt="Staff">
+                                <div class="staff-info">
+                                    <h4>Alexandre Dubois</h4>
+                                    <p>Coiffeur</p>
+                                    <div class="staff-stats">
+                                        <span><i class="fas fa-calendar-alt"></i> 7 réservations</span>
+                                        <span><i class="fas fa-star"></i> 4.7</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="staff-member">
+                                <img src="https://randomuser.me/api/portraits/women/60.jpg" alt="Staff">
+                                <div class="staff-info">
+                                    <h4>Laura Morel</h4>
+                                    <p>Maquilleuse</p>
+                                    <div class="staff-stats">
+                                        <span><i class="fas fa-calendar-alt"></i> 4 réservations</span>
+                                        <span><i class="fas fa-star"></i> 4.9</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+    
+{% endblock content %}
+    

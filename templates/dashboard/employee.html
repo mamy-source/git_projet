@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+<style>
+    /* Dashboard spécifique employé */
+    .card {
+        border-radius: 0.35rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    }
+
+    .card-header {
+        background-color: #f8f9fc;
+        border-bottom: 1px solid #e3e6f0;
+    }
+
+    .badge {
+        font-size: 0.85em;
+        font-weight: 600;
+        padding: 0.35em 0.65em;
+    }
+
+    .badge-primary {
+        background-color: #4e73df;
+    }
+
+    .badge-success {
+        background-color: #1cc88a;
+    }
+
+    .badge-warning {
+        background-color: #f6c23e;
+    }
+
+    .badge-danger {
+        background-color: #e74a3b;
+    }
+
+    .list-group-item {
+        transition: all 0.3s;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fc;
+    }
+</style>
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Tableau de bord Employé</h1>
+        <span class="d-none d-sm-inline-block">Bienvenue, {{ request.user.get_full_name }}</span>
+    </div>
+
+    <!-- Statistiques rapides -->
+    <div class="row">
+        <!-- Services actifs -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Services actifs</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ services.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rendez-vous à venir -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Rendez-vous aujourd'hui</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ appointments|length }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="row">
+        <!-- Calendrier des rendez-vous -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Vos rendez-vous</h6>
+                </div>
+                <div class="card-body">
+                    {% if appointments %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="appointmentsTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Client</th>
+                                        <th>Service</th>
+                                        <th>Date/Heure</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appointment in appointments %}
+                                    <tr>
+                                        <td>{{ appointment.client.get_full_name }}</td>
+                                        <td>{{ appointment.service.name }}</td>
+                                        <td>{{ appointment.start_time|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            <span class="badge badge-{{ appointment.get_status_class }}">
+                                                {{ appointment.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="#" class="btn btn-sm btn-info" title="Détails">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted">Aucun rendez-vous prévu pour le moment.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Services et horaires -->
+        <div class="col-lg-4 mb-4">
+            <!-- Liste des services -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Vos services</h6>
+                </div>
+                <div class="card-body">
+                    {% if services %}
+                        <div class="list-group">
+                            {% for service in services %}
+                            <div class="list-group-item list-group-item-action flex-column align-items-start">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ service.name }}</h5>
+                                    <small>{{ service.duration }} minutes</small>
+                                </div>
+                                <p class="mb-1">{{ service.description|truncatechars:60 }}</p>
+                                <small>{{ service.price }} €</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted">Aucun service actif pour le moment.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Emploi du temps -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Votre emploi du temps</h6>
+                </div>
+                <div class="card-body">
+                    {% if work_schedule %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Jour</th>
+                                        <th>Heures de travail</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for day, hours in work_schedule.items %}
+                                    <tr>
+                                        <td>{{ day|capfirst }}</td>
+                                        <td>
+                                            {% if hours %}
+                                                {{ hours.0 }} - {{ hours.1 }}
+                                            {% else %}
+                                                <span class="text-muted">Fermé</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted">Aucun emploi du temps défini.</p>
+                    {% endif %}
+                    <button class="btn btn-primary btn-block mt-2" data-toggle="modal" data-target="#scheduleModal">
+                        Modifier l'emploi du temps
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour modifier l'emploi du temps -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scheduleModalLabel">Modifier l'emploi du temps</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form method="post" action="{% url 'update_employee_profile' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Formulaire pour modifier l'emploi du temps -->
+                    <div class="form-group">
+                        <label for="work_schedule_json">Emploi du temps (JSON)</label>
+                        <textarea class="form-control" id="work_schedule_json" name="work_schedule" rows="10">
+                            {{ employee_profile.work_schedule|default:"{}" }}
+                        </textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+                    <button class="btn btn-primary" type="submit">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialisation des éléments interactifs
+$(document).ready(function() {
+    // Initialisation du tableau des rendez-vous avec DataTables
+    $('#appointmentsTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/French.json"
+        },
+        "order": [[2, "asc"]]
+    });
+});
+</script>
+{% endblock %}

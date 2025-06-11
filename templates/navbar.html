@@ -1,0 +1,32 @@
+<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+	<div class="container">
+	    <a class="navbar-brand" href="#"><span class="flaticon-lotus"></span>Energen</a>
+	    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+	        <span class="oi oi-menu"></span> Menu
+	    </button>
+	    <div class="collapse navbar-collapse" id="ftco-nav">
+	        <ul class="navbar-nav ml-auto">
+	          <li class="nav-item active"><a href="{% url 'home' %}" class="nav-link {% if request.path == '' %}active{% endif %}">Home</a></li>
+	          <li class="nav-item"><a href="{% url 'about' %}" class="nav-link {% if request.path == '/about/' %}active{% endif %}">About</a></li>
+	          <li class="nav-item"><a href="{% url 'service_list' %}" class="nav-link {% if request.path == '/treatments/' %}active{% endif %}">Services</a></li>
+	          <li class="nav-item"><a href="{% url 'contact' %}" class="nav-link {% if request.path == '/contact/' %}active{% endif %}">Contact</a></li>
+			  {% if user.is_authenticated %}
+				<!-- User Dropdown -->
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle " href="#" id="navbarDropdown" role="button"
+						data-bs-toggle="dropdown">
+						<i class="fas fa-user-circle"></i> {{ user.username }}
+					</a>
+					<ul class="dropdown-menu dropdown-menu-end">
+						<li><a class="dropdown-item" href="{% url 'profile' %}">Profil</a></li>
+						<li><a class="dropdown-item" href="#">Setting</a></li>
+						<li><hr class="dropdown-divider"></li>
+						<li><a class="dropdown-item" href="{% url 'logout' %}">LogOut</a></li>
+					</ul>
+				</li>
+                {% endif %}
+	        </ul>
+	    </div>
+	</div>
+</nav>
+    <!-- END nav -->
